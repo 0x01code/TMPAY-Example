@@ -1,5 +1,7 @@
 <?php
 
+require_once 'config.php';
+
 // ถ้าไม่ใช้ IP ของ TMPAY ไม่ให้เข้าหน้านี้
 if ($_SERVER['REMOTE_ADDR'] != '203.146.127.112') {
     die('Access Denied');
@@ -23,12 +25,14 @@ $amount = $_GET['real_amount'];
 $status = $_GET['status'];
 
 if ($status == 1) {
-    /* Code เพิ่มเงินที่นี่ */
-    /* เช่น
-        $user_id_refill = $this->db->query( 'SELECT TOP 1 user_id FROM truemoney WHERE truemoney = ? ', password);
-        $this->db->query( 'UPDATE point = pount + ? WHERE user_id = ? ', $amount, $user_id_refill);
-    */
-    die('SUCCEED|TOPPED_UP_THB_' . $amount . '_TO_' . $user_id_refill);
+    $result = $con->query("SELECT * FROM tmpay WHERE password='$password'");
+    $row = $result->fetch_object();
+
+    $username = $row->username;
+
+    $con->query("UPDATE users SET point = point + $amount WHERE username='$username'");
+
+    die('SUCCEED|TOPPED_UP_THB_' . $amount . '_TO_' . $username);
 } else {
     /* ไม่สามารถเติมเงินได ้ */
     die('ERROR|ANY_REASONS');
